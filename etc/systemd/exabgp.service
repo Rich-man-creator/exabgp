@@ -1,0 +1,24 @@
+[Unit]
+Description=ExaBGP
+Documentation=man:exabgp(1)
+Documentation=man:exabgp.conf(5)
+Documentation=https://github.com/Exa-Networks/exabgp/wiki
+After=network.target
+ConditionPathExists=/etc/exabgp/exabgp.conf
+
+[Service]
+User=exabgp
+Group=exabgp
+Environment=exabgp_daemon_daemonize=false
+RuntimeDirectory=exabgp
+RuntimeDirectoryMode=0750
+ExecStartPre=-/usr/bin/mkfifo /run/exabgp/exabgp.in
+ExecStartPre=-/usr/bin/mkfifo /run/exabgp/exabgp.out
+ExecStart=/usr/sbin/exabgp /etc/exabgp/exabgp.conf
+ExecReload=/bin/kill -USR1 $MAINPID
+Restart=always
+CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
+AmbientCapabilities=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
+
+[Install]
+WantedBy=multi-user.target
